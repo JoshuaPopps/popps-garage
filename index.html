@@ -6,6 +6,7 @@
 <title>Popps's Garage</title>
 <meta name="description" content="One garage, four tools — the Evo wiring planner, carb tune journal, bike maintenance log and garage dyno. Built in the garage, open source and free.">
 <meta name="theme-color" content="#d8c99f">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f3e3ba'/%3E%3Crect x='4' y='4' width='56' height='56' fill='none' stroke='%230b0c09' stroke-width='4'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='34' font-weight='bold' text-anchor='middle' fill='%23bd3d1e'%3EP%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,12 +67,104 @@
 
   </section>
 
+  <section class="install" aria-label="Add the garage to your home screen">
+    <h2>Put the garage on your home screen</h2>
+    <p>One tap from here and the whole garage lives next to your other apps.</p>
+    <button class="install-btn" id="installBtn" type="button">Add to Home Screen</button>
+    <div class="install-walk" id="installWalk" hidden>
+      <p class="install-step-label" id="installStepLabel">Step 1 of 3</p>
+      <p class="install-step" id="installStepText"></p>
+      <div class="install-dots" id="installDots" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="install-nav">
+        <button class="install-nav-btn" id="installBack" type="button">Back</button>
+        <button class="install-nav-btn install-next" id="installNext" type="button">Next</button>
+      </div>
+      <p class="install-platform"><button type="button" id="installAndroid">Android</button> &middot; <button type="button" id="installIPhone">iPhone</button></p>
+    </div>
+    <p class="install-done" id="installDone" hidden>Done &mdash; look for the Garage icon on your home screen.</p>
+  </section>
+
   <footer class="foot">
     <p>Built in the garage &mdash; open source &amp; free. No accounts, no tracking, no ads.</p>
-    <p class="foot-small">On your phone? Open an app, tap Share &rarr; Add to Home Screen, and it lives next to your other apps. More tools land here when I get bored enough to publish one &mdash; same shop.</p>
+    <p class="foot-small">Each app can live on your home screen too &mdash; open one, tap Share &rarr; Add to Home Screen. More tools land here when I get bored enough to publish one &mdash; same shop.</p>
     <p class="foot-small"><a href="https://github.com/joshuapopps">github.com/joshuapopps</a></p>
   </footer>
 
 </main>
+<script>
+(function () {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+  var STEPS = {
+    android: [
+      'Tap Add to Home Screen, then tap Install on the prompt that pops up.',
+      'If no prompt appears, open Chrome\u2019s \u22ee menu and tap Add to Home screen.',
+      'Find the Garage icon on your home screen and open it \u2014 the whole garage is there.'
+    ],
+    iphone: [
+      'Tap the Share button at the bottom of Safari.',
+      'Scroll down and tap Add to Home Screen.',
+      'Tap Add in the top right \u2014 the Garage icon lands on your home screen.'
+    ]
+  };
+  var platform = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ? 'iphone' : 'android';
+  var step = 0;
+  var deferredPrompt = null;
+  var btn = document.getElementById('installBtn');
+  var walk = document.getElementById('installWalk');
+  var label = document.getElementById('installStepLabel');
+  var text = document.getElementById('installStepText');
+  var dots = document.getElementById('installDots').children;
+  var back = document.getElementById('installBack');
+  var next = document.getElementById('installNext');
+  var done = document.getElementById('installDone');
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+  function render() {
+    label.textContent = 'Step ' + (step + 1) + ' of 3';
+    text.textContent = STEPS[platform][step];
+    for (var i = 0; i < dots.length; i++) {
+      dots[i].className = i === step ? 'on' : '';
+    }
+    back.disabled = step === 0;
+    next.textContent = step === 2 ? 'Done' : 'Next';
+  }
+  function showWalk() {
+    done.hidden = true;
+    walk.hidden = false;
+    step = 0;
+    render();
+  }
+  btn.addEventListener('click', function () {
+    if (deferredPrompt) {
+      var p = deferredPrompt;
+      deferredPrompt = null;
+      p.prompt();
+      p.userChoice.then(function () { showWalk(); });
+    } else {
+      showWalk();
+    }
+  });
+  back.addEventListener('click', function () {
+    if (step > 0) { step--; render(); }
+  });
+  next.addEventListener('click', function () {
+    if (step < 2) { step++; render(); }
+    else {
+      walk.hidden = true;
+      done.hidden = false;
+    }
+  });
+  document.getElementById('installAndroid').addEventListener('click', function () {
+    platform = 'android'; step = 0; render();
+  });
+  document.getElementById('installIPhone').addEventListener('click', function () {
+    platform = 'iphone'; step = 0; render();
+  });
+})();
+</script>
 </body>
 </html>

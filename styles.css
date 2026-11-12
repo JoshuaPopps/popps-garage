@@ -184,6 +184,107 @@ h1 {
   font-size: .74rem;
 }
 
+/* --- Add to home screen --- */
+
+.install {
+  margin-top: 44px;
+  padding: 20px;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.install h2 {
+  margin: 0 0 8px;
+  font-family: "Special Elite", "Courier New", monospace;
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.install p { margin: 0 0 12px; }
+
+.install-btn {
+  background: var(--orange);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  color: var(--orange-ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .95rem;
+  font-weight: 600;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.install-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 rgba(16, 14, 9, .5);
+}
+
+.install-walk {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 2px dashed var(--ink);
+}
+
+.install-step-label {
+  margin: 0 0 6px;
+  color: var(--orange);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.install-step { font-size: 1.05rem; }
+
+.install-dots { display: flex; gap: 8px; margin: 0 0 12px; }
+
+.install-dots span {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+}
+
+.install-dots span.on { background: var(--orange); }
+
+.install-nav { display: flex; gap: 10px; }
+
+.install-nav-btn {
+  background: var(--surface-2);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .85rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.install-nav-btn:disabled { opacity: .45; cursor: default; }
+
+.install-next { background: var(--orange); color: var(--orange-ink); }
+
+.install-platform {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .8rem;
+}
+
+.install-platform button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--orange);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.install-done { color: var(--signal); font-weight: 600; }
+
 /* --- Footer --- */
 
 .foot {
