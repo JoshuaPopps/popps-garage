@@ -20,7 +20,6 @@
   --shadow-sm: 4px 4px 0 rgba(16, 14, 9, .5);
   --paper-grid: rgba(66, 91, 77, .105);
   --smudge: rgba(67, 45, 20, .13);
-  --coffee: rgba(104, 57, 18, .27);
   --radius: 0;
 }
 
@@ -49,8 +48,7 @@ body::before {
   pointer-events: none;
   background:
     radial-gradient(ellipse at 8% 13%, var(--smudge) 0 1.4%, transparent 3.4%),
-    radial-gradient(ellipse at 88% 27%, var(--smudge) 0 1%, transparent 3%),
-    radial-gradient(ellipse at 70% 90%, var(--coffee) 0 1.2%, transparent 3.2%);
+    radial-gradient(ellipse at 88% 27%, var(--smudge) 0 1%, transparent 3%);
 }
 
 .wrap {
