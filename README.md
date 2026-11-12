@@ -9,7 +9,7 @@ https://joshuapopps.github.io/popps-garage/
   https://joshuapopps.github.io/carb-tune-journal-pwa/
 - **Bike Maintenance Log** — the service tracker.
   https://joshuapopps.github.io/bike-maintenance-log-pwa/
-- **Popps's Garage Dyno** — the dyno app.
+- **Pocket Garage Dyno** — the dyno app.
   https://joshuapopps.github.io/popps-garage-dyno/
 
 Plain HTML/CSS, no backend. Same Evo visual system as the apps
