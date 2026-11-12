@@ -1,0 +1,204 @@
+/* Popps's Garage — landing page.
+   Visual system: Evo Wiring Planner, palette 1a.
+   Cream paper, roughed black ink, blue graph grid, typewriter display,
+   red-wire accent, heavy ink borders, hard offset shadows. */
+
+:root {
+  --bg: #d8c99f;
+  --surface: #f3e3ba;
+  --surface-2: #d7c392;
+  --paper: #f3e3ba;
+  --input-bg: #fbf6e6;
+  --ink: #0b0c09;
+  --muted: #484236;
+  --line: #181812;
+  --orange: #bd3d1e;
+  --orange-ink: #fff3d3;
+  --signal: #185a40;
+  --caution: #704b08;
+  --shadow: 7px 8px 0 rgba(16, 14, 9, .5);
+  --shadow-sm: 4px 4px 0 rgba(16, 14, 9, .5);
+  --paper-grid: rgba(66, 91, 77, .105);
+  --smudge: rgba(67, 45, 20, .13);
+  --coffee: rgba(104, 57, 18, .27);
+  --radius: 0;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 27px, var(--paper-grid) 27px 28px),
+    repeating-linear-gradient(90deg, transparent 0 27px, var(--paper-grid) 27px 28px),
+    var(--bg);
+  color: var(--ink);
+  font-family: "Chivo", system-ui, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 8% 13%, var(--smudge) 0 1.4%, transparent 3.4%),
+    radial-gradient(ellipse at 88% 27%, var(--smudge) 0 1%, transparent 3%),
+    radial-gradient(ellipse at 70% 90%, var(--coffee) 0 1.2%, transparent 3.2%);
+}
+
+.wrap {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 40px 20px 56px;
+}
+
+/* --- Masthead --- */
+
+.masthead { margin: 8px 0 34px; }
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--orange);
+  font-family: "Caveat", cursive;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.1;
+  transform: rotate(-.6deg);
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-family: "Special Elite", "Courier New", monospace;
+  font-size: clamp(2.6rem, 8vw, 4.4rem);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: .01em;
+}
+
+.lede {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 1.08rem;
+}
+
+/* --- Card grid --- */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+@media (max-width: 720px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow);
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.card:hover,
+.card:focus-visible {
+  transform: translate(-2px, -2px);
+  box-shadow: 9px 10px 0 rgba(16, 14, 9, .5);
+  outline: none;
+}
+
+.card:active {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0 rgba(16, 14, 9, .5);
+}
+
+.card-img {
+  display: block;
+  border-bottom: 2px solid var(--ink);
+  background: var(--paper);
+  line-height: 0;
+}
+
+.card-img img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px 20px;
+}
+
+.kicker {
+  color: var(--orange);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .74rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.card-title {
+  font-family: "Special Elite", "Courier New", monospace;
+  font-size: 1.55rem;
+  line-height: 1.1;
+}
+
+.card-desc {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.card-cta {
+  margin-top: 8px;
+  align-self: flex-start;
+  background: var(--orange);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  color: var(--orange-ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .85rem;
+  font-weight: 600;
+  padding: 8px 14px;
+}
+
+.card-note {
+  margin-top: 4px;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .74rem;
+}
+
+/* --- Footer --- */
+
+.foot {
+  margin-top: 44px;
+  padding-top: 20px;
+  border-top: 2px solid var(--ink);
+}
+
+.foot p { margin: 0 0 8px; }
+
+.foot-small {
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.foot a { color: var(--orange); }
