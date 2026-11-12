@@ -1,4 +1,4 @@
-# Popps's Garage
+# Pocket Garage
 
 One front door for the garage apps — live at
 https://joshuapopps.github.io/popps-garage/

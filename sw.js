@@ -1,6 +1,6 @@
-/* Popps's Garage service worker — caches the landing page shell so the
+/* Pocket Garage service worker — caches the landing page shell so the
    garage works offline and can be added to the home screen. */
-var CACHE = 'popps-garage-v1';
+var CACHE = 'pocket-garage-v1';
 var ASSETS = [
   './',
   'index.html',
