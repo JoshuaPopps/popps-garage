@@ -79,9 +79,9 @@ body {
 
 h1 {
   margin: 0 0 12px;
-  font-family: "UnifrakturCook", serif;
+  font-family: "UnifrakturMaguntia", serif;
   font-size: clamp(3rem, 9vw, 5rem);
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.05;
   letter-spacing: .01em;
 }
@@ -172,9 +172,9 @@ h1 {
 }
 
 .card-title {
-  font-family: "UnifrakturCook", serif;
+  font-family: "UnifrakturMaguntia", serif;
   font-size: 1.65rem;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: .01em;
   line-height: 1.15;
 }
@@ -219,9 +219,9 @@ h1 {
   padding-bottom: 10px;
   border-bottom: 2px solid var(--ink);
   color: var(--head-color);
-  font-family: "UnifrakturCook", serif;
+  font-family: "UnifrakturMaguntia", serif;
   font-size: 1.6rem;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: .01em;
 }
 
