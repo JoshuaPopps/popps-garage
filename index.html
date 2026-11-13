@@ -85,9 +85,8 @@
 
   <section class="install" aria-label="Add the garage to your home screen">
     <h2>Put the garage on your home screen</h2>
-    <p>One tap from here and the whole garage lives next to your other apps.</p>
-    <button class="install-btn" id="installBtn" type="button">Add to Home Screen</button>
-    <div class="install-walk" id="installWalk" hidden>
+    <p>Here’s how to put the whole garage next to your other apps.</p>
+    <div class="install-walk" id="installWalk">
       <p class="install-step-label" id="installStepLabel">Step 1 of 3</p>
       <p class="install-step" id="installStepText"></p>
       <div class="install-dots" id="installDots" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -109,8 +108,8 @@
   var STEPS = {
     android: [
       'Open this page in Chrome first \u2014 if you came from the Muse app, tap \u22ee then Open in Chrome.',
-      'Tap Add to Home Screen at the bottom of the page, then tap Install on the prompt that pops up.',
-      'No prompt? Open Chrome\u2019s \u22ee menu and tap Add to Home screen, then find the Garage icon on your home screen.'
+      'Tap Chrome\u2019s \u22ee menu, then Add to Home screen.',
+      'Tap Install on the prompt \u2014 the Garage icon lands on your home screen.'
     ],
     iphone: [
       'Tap the Share button at the bottom of Safari.',
@@ -120,8 +119,6 @@
   };
   var platform = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ? 'iphone' : 'android';
   var step = 0;
-  var deferredPrompt = null;
-  var btn = document.getElementById('installBtn');
   var walk = document.getElementById('installWalk');
   var label = document.getElementById('installStepLabel');
   var text = document.getElementById('installStepText');
@@ -129,10 +126,6 @@
   var back = document.getElementById('installBack');
   var next = document.getElementById('installNext');
   var done = document.getElementById('installDone');
-  window.addEventListener('beforeinstallprompt', function (e) {
-    e.preventDefault();
-    deferredPrompt = e;
-  });
   function render() {
     label.textContent = 'Step ' + (step + 1) + ' of 3';
     text.textContent = STEPS[platform][step];
@@ -142,22 +135,7 @@
     back.disabled = step === 0;
     next.textContent = step === 2 ? 'Done' : 'Next';
   }
-  function showWalk() {
-    done.hidden = true;
-    walk.hidden = false;
-    step = 0;
-    render();
-  }
-  btn.addEventListener('click', function () {
-    if (deferredPrompt) {
-      var p = deferredPrompt;
-      deferredPrompt = null;
-      p.prompt();
-      p.userChoice.then(function () { showWalk(); });
-    } else {
-      showWalk();
-    }
-  });
+  render();
   back.addEventListener('click', function () {
     if (step > 0) { step--; render(); }
   });
