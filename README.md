@@ -12,8 +12,8 @@ https://joshuapopps.github.io/popps-garage/
 - **Pocket Garage Dyno** — the dyno app.
   https://joshuapopps.github.io/popps-garage-dyno/
 
-Plain HTML/CSS, no backend. Same Evo visual system as the apps
-(cream paper, black ink, graph grid, typewriter type, red accent).
+Plain HTML/CSS, no backend. Same 1990 Treatment visual system as the apps
+(gloss tank black, chrome, purple glow, Old English headings).
 
 Card pictures live under `assets/` as self-contained SVG files — each one
 carries its ink-on-graph-paper drawing embedded, so the page has no

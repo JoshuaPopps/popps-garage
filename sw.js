@@ -1,16 +1,17 @@
 /* Pocket Garage service worker — caches the landing page shell so the
    garage works offline and can be added to the home screen. */
-var CACHE = 'pocket-garage-v8';
+var CACHE = 'pocket-garage-v9';
 var ASSETS = [
   './',
   'index.html',
   'styles.css',
   'manifest.webmanifest',
   'assets/icon.svg',
-  'assets/evo-wiring.svg',
-  'assets/carb-tune.svg',
-  'assets/bike-log.svg',
-  'assets/dyno.svg'
+  'assets/evo-wiring-90.svg',
+  'assets/carb-tune-90.svg',
+  'assets/bike-log-90.svg',
+  'assets/dyno-90.svg',
+  'assets/speedometer-90.svg'
 ];
 
 self.addEventListener('install', function (event) {
