@@ -1,13 +1,13 @@
 /* Pocket Garage service worker — caches the landing page shell so the
    garage works offline and can be added to the home screen. */
-var CACHE = 'pocket-garage-v10';
+var CACHE = 'pocket-garage-v11';
 var ASSETS = [
   './',
   'index.html',
   'styles.css',
   'manifest.webmanifest',
   'assets/icon.svg',
-  'assets/evo-wiring-90.svg',
+  'assets/evo-wiring-90b.svg',
   'assets/carb-tune-90.svg',
   'assets/bike-log-90.svg',
   'assets/dyno-90.svg',
