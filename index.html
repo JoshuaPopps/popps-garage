@@ -83,75 +83,12 @@
     <p class="foot-small"><a href="https://github.com/joshuapopps">github.com/joshuapopps</a></p>
   </footer>
 
-  <section class="install" aria-label="Add the garage to your home screen">
-    <h2>Put the garage on your home screen</h2>
-    <p>Here’s how to put the whole garage next to your other apps.</p>
-    <div class="install-walk" id="installWalk">
-      <p class="install-step-label" id="installStepLabel">Step 1 of 3</p>
-      <p class="install-step" id="installStepText"></p>
-      <div class="install-dots" id="installDots" aria-hidden="true"><span></span><span></span><span></span></div>
-      <div class="install-nav">
-        <button class="install-nav-btn" id="installBack" type="button">Back</button>
-        <button class="install-nav-btn install-next" id="installNext" type="button">Next</button>
-      </div>
-      <p class="install-platform"><button type="button" id="installAndroid">Android</button> &middot; <button type="button" id="installIPhone">iPhone</button></p>
-    </div>
-    <p class="install-done" id="installDone" hidden>Done &mdash; look for the Garage icon on your home screen.</p>
-  </section>
-
 </main>
 <script>
 (function () {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
   }
-  var STEPS = {
-    android: [
-      'Open this page in Chrome first \u2014 if you came from the Muse app, tap \u22ee then Open in Chrome.',
-      'Tap Chrome\u2019s \u22ee menu, then Add to Home screen.',
-      'Tap Install on the prompt \u2014 the Garage icon lands on your home screen.'
-    ],
-    iphone: [
-      'Tap the Share button at the bottom of Safari.',
-      'Scroll down and tap Add to Home Screen.',
-      'Tap Add in the top right \u2014 the Garage icon lands on your home screen.'
-    ]
-  };
-  var platform = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ? 'iphone' : 'android';
-  var step = 0;
-  var walk = document.getElementById('installWalk');
-  var label = document.getElementById('installStepLabel');
-  var text = document.getElementById('installStepText');
-  var dots = document.getElementById('installDots').children;
-  var back = document.getElementById('installBack');
-  var next = document.getElementById('installNext');
-  var done = document.getElementById('installDone');
-  function render() {
-    label.textContent = 'Step ' + (step + 1) + ' of 3';
-    text.textContent = STEPS[platform][step];
-    for (var i = 0; i < dots.length; i++) {
-      dots[i].className = i === step ? 'on' : '';
-    }
-    back.disabled = step === 0;
-    next.textContent = step === 2 ? 'Done' : 'Next';
-  }
-  render();
-  back.addEventListener('click', function () {
-    if (step > 0) { step--; render(); }
-  });
-  next.addEventListener('click', function () {
-    if (step < 2) { step++; render(); }
-    else {
-      walk.hidden = true;
-      done.hidden = false;
-    }
-  });
-  document.getElementById('installAndroid').addEventListener('click', function () {
-    platform = 'android'; step = 0; render();
-  });
-  document.getElementById('installIPhone').addEventListener('click', function () {
-    platform = 'iphone'; step = 0; render();
-  });
 })();
 </script>
 </body>
