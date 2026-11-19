@@ -1,6 +1,6 @@
 /* Pocket Garage service worker — caches the landing page shell so the
    garage works offline and can be added to the home screen. */
-var CACHE = 'pocket-garage-v14';
+var CACHE = 'pocket-garage-v15';
 var ASSETS = [
   './',
   'index.html',
@@ -11,7 +11,8 @@ var ASSETS = [
   'assets/carb-tune-90.svg',
   'assets/bike-log-90.svg',
   'assets/dyno-90.svg',
-  'assets/speedometer-90.svg'
+  'assets/speedometer-90.svg',
+  'assets/timing-90.svg'
 ];
 
 self.addEventListener('install', function (event) {

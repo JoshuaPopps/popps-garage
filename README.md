@@ -11,6 +11,11 @@ https://joshuapopps.github.io/popps-garage/
   https://joshuapopps.github.io/bike-maintenance-log-pwa/
 - **Pocket Garage Dyno** — the dyno app.
   https://joshuapopps.github.io/popps-garage-dyno/
+- **GPS Speedometer** — your phone is the speedo.
+  https://joshuapopps.github.io/gps-speedometer/
+- **Ignition Timing Helper** — time the spark: Dyna 2000i setup,
+  flywheel mark math, and the bench tests.
+  https://joshuapopps.github.io/ignition-timing-helper/
 
 Plain HTML/CSS, no backend. Same 1990 Treatment visual system as the apps
 (gloss tank black, chrome, purple glow, Old English headings).
