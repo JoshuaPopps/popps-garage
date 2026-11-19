@@ -16,6 +16,9 @@ https://joshuapopps.github.io/popps-garage/
 - **Ignition Timing Helper** — time the spark: Dyna 2000i setup,
   flywheel mark math, and the bench tests.
   https://joshuapopps.github.io/ignition-timing-helper/
+- **Garage Build Sheets** — the living build sheet: your bikes, your
+  mods, your photos and notes, in six magazine styles.
+  https://joshuapopps.github.io/garage-build-sheets/
 
 Plain HTML/CSS, no backend. Same 1990 Treatment visual system as the apps
 (gloss tank black, chrome, purple glow, Old English headings).
