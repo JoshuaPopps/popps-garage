@@ -3,6 +3,8 @@
 One front door for the garage apps — live at
 https://joshuapopps.github.io/popps-garage/
 
+- **GPS Speedometer** — your phone is the speedo.
+  https://joshuapopps.github.io/gps-speedometer/
 - **Evo Wiring Planner** — build a harness you can trace at midnight.
   https://joshuapopps.github.io/evo-wiring-planner/
 - **Carb Tune Journal** — the jetting notebook.
@@ -11,8 +13,7 @@ https://joshuapopps.github.io/popps-garage/
   https://joshuapopps.github.io/bike-maintenance-log-pwa/
 - **Pocket Garage Dyno** — the dyno app.
   https://joshuapopps.github.io/popps-garage-dyno/
-- **GPS Speedometer** — your phone is the speedo.
-  https://joshuapopps.github.io/gps-speedometer/
+
 - **Ignition Timing Helper** — time the spark: Dyna 2000i setup,
   flywheel mark math, and the bench tests.
   https://joshuapopps.github.io/ignition-timing-helper/
