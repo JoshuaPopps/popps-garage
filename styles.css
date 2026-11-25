@@ -93,6 +93,14 @@ h1 {
   font-size: 1.08rem;
 }
 
+.freeline {
+  margin: 14px 0 0;
+  color: var(--accent-bright);
+  font-size: .98rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+}
+
 /* --- Card grid --- */
 
 .grid {
@@ -360,6 +368,50 @@ h1 {
 .dash-ok { color: var(--ink-soft); }
 
 .dash-empty { color: var(--muted); }
+
+/* --- Health by system --- */
+
+.health-list {
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.health-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+}
+
+.health-name {
+  flex: none;
+  width: 84px;
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.health-pill {
+  flex: none;
+  padding: 1px 8px;
+  border: 1px solid var(--line-strong);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.health-overdue { border-color: var(--signal); color: var(--signal); }
+.health-soon { border-color: #e8b13c; color: #e8b13c; }
+.health-ok { border-color: #3fae5a; color: #3fae5a; }
+.health-nodata { border-color: var(--line-strong); color: var(--muted); }
+
+.health-detail { color: var(--ink-soft); font-size: .9rem; }
 
 .dash-links {
   display: flex;

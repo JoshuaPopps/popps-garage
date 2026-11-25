@@ -20,6 +20,7 @@
     <p class="eyebrow">shop notes &mdash; one garage, eight tools</p>
     <h1 class="chrome-text">Pocket Garage</h1>
     <p class="lede">Everything built in the garage, in one place. Pick a tool and get to work &mdash; no accounts, no ads, nothing to install unless you want it on your home screen.</p>
+    <p class="freeline">Free. No account. Works offline in the garage.</p>
   </header>
 
   <section class="dash" id="bike-dash" aria-label="Your bikes">
@@ -205,6 +206,17 @@
  * Due-task math is the Bike Maintenance Log's own rule, ported here:
  * last service (or task creation) + interval, miles leg and months
  * leg, worst leg wins; due-soon window 500 mi / 30 days.
+ *
+ * Health by system (brakes, tires, fluids, electrical, engine) is a
+ * roll-up of those same due items, nothing more: the log stores no
+ * system/category field on a task, so a task is filed under a system
+ * by keyword in its name (see SYSTEMS — brakes checked first, so
+ * "Brake fluid" is brakes, not fluids). A system's status is the
+ * worst of its tasks' statuses from taskStatus() above. A task with
+ * no interval set carries no due data and does not drive a status;
+ * a system with no interval-bearing task shows "no data", never a
+ * guessed score. Tasks matching no system still show under "Due
+ * next" and are counted in the footnote under the health rows.
  */
 (function () {
   'use strict';
@@ -248,6 +260,110 @@
   };
   var STAGE_WEIGHTS = { idea: 0, planned: 0.25, purchased: 0.55, installed: 1 };
   var SOON_MILES = 500, SOON_DAYS = 30;
+
+  /* Systems, in display order. Checked in this order so a name that
+   * spans two systems lands in the more specific one ("Brake fluid"
+   * is brakes, "Engine oil" is engine, "Primary fluid" is fluids). */
+  var SYSTEMS = [
+    { key: 'brakes', label: 'Brakes',
+      words: ['brake', 'pad', 'rotor', 'caliper', 'master cylinder'] },
+    { key: 'tires', label: 'Tires',
+      words: ['tire', 'tyre', 'wheel', 'spoke', 'tube', 'rim'] },
+    { key: 'engine', label: 'Engine',
+      words: ['engine', 'valve', 'piston', 'ring', 'cam', 'lifter', 'pushrod',
+              'head gasket', 'compression', 'exhaust', 'intake', 'air filter',
+              'fuel', 'carb', 'top end'] },
+    { key: 'electrical', label: 'Electrical',
+      words: ['battery', 'spark plug', 'plug wire', 'coil', 'charging', 'stator',
+              'regulator', 'rectifier', 'light', 'bulb', 'horn', 'switch', 'fuse',
+              'wiring', 'ignition', 'starter', 'alternator', 'points', 'condenser'] },
+    { key: 'fluids', label: 'Fluids',
+      words: ['oil', 'fluid', 'coolant', 'fork', 'primary', 'transmission',
+              'gearbox', 'grease', 'lube'] }
+  ];
+
+  /* Whole-word match (with a plural allowance) on the normalized
+   * name, so "primary" does not trip the "rim" keyword and "brakes"
+   * still matches "brake". Phrases ("master cylinder") match as a
+   * run of whole words. */
+  function classifyTask(name) {
+    var n = ' ' + norm(name) + ' ';
+    if (n.trim() === '') return null;
+    function hasWord(kw) {
+      return n.indexOf(' ' + kw + ' ') !== -1 ||
+        n.indexOf(' ' + kw + 's ') !== -1 ||
+        n.indexOf(' ' + kw + 'es ') !== -1;
+    }
+    for (var i = 0; i < SYSTEMS.length; i++) {
+      var words = SYSTEMS[i].words;
+      for (var j = 0; j < words.length; j++) {
+        if (hasWord(words[j])) return SYSTEMS[i].key;
+      }
+    }
+    return null;
+  }
+
+  /* Per-system health from the log's own due items (r.service.due,
+   * already computed by taskStatus()). A due item drives a status
+   * only when it has a miles/months leg (details.length > 1) — a
+   * task with no interval has no due data to score from. Returns
+   * { rows: [{ system, status, detail }], unassigned, summary }. */
+  function systemHealth(r) {
+    var rows = SYSTEMS.map(function (s) {
+      return { system: s, status: 'no data', detail: 'nothing logged', tasks: [] };
+    });
+    var unassigned = 0;
+    var byKey = {};
+    rows.forEach(function (rw) { byKey[rw.system.key] = rw; });
+    if (r.service) {
+      r.service.due.forEach(function (d) {
+        var key = classifyTask(d.name);
+        if (!key) { unassigned++; return; }
+        byKey[key].tasks.push(d);
+      });
+    }
+    rows.forEach(function (rw) {
+      /* r.service.due is already sorted worst-first, so the first
+       * interval-bearing task is the one driving the status. */
+      var scored = rw.tasks.filter(function (d) { return d.details.length > 1; });
+      if (!scored.length) {
+        if (rw.tasks.length) {
+          var lastDone = null;
+          rw.tasks.forEach(function (d) {
+            if (d.details[0] && d.details[0].indexOf('last done') === 0) lastDone = d.details[0];
+          });
+          rw.detail = rw.tasks.length + ' task' + (rw.tasks.length > 1 ? 's' : '') +
+            ' logged, no service interval set' + (lastDone ? ' — ' + lastDone : '');
+        }
+        return;
+      }
+      var driver = scored[0];
+      rw.status = driver.status;
+      rw.detail = driver.name + ' — ' + driver.details.slice(1).join('; ') +
+        ' (' + driver.details[0] + ')';
+      if (scored.length > 1) {
+        rw.detail += ' · +' + (scored.length - 1) + ' more task' + (scored.length > 2 ? 's' : '');
+      }
+    });
+    var withData = rows.filter(function (rw) { return rw.status !== 'no data'; }).length;
+    var counts = { ok: 0, 'due-soon': 0, overdue: 0 };
+    rows.forEach(function (rw) { if (counts[rw.status] != null) counts[rw.status]++; });
+    var summary;
+    if (!r.service) {
+      summary = 'No service log for this bike yet — add tasks in the Bike Maintenance Log and this fills in.';
+    } else if (!r.service.due.length) {
+      summary = 'No tasks in the service log yet.';
+    } else if (!withData) {
+      summary = 'Tasks logged, but none with a service interval yet — set miles or months on a task to get a status.';
+    } else {
+      var parts = [];
+      if (counts.overdue) parts.push(counts.overdue + ' overdue');
+      if (counts['due-soon']) parts.push(counts['due-soon'] + ' due soon');
+      if (counts.ok) parts.push(counts.ok + ' OK');
+      summary = withData + ' of 5 systems have data — ' + parts.join(', ') + '.';
+    }
+    return { rows: rows, unassigned: unassigned, summary: summary };
+  }
 
   /* ---------- small helpers ---------- */
 
@@ -563,6 +679,27 @@
       chip('Diagnostic', !!(r.diag && r.diag.sessions.length), r.diag ? r.diag.sessions.length + ' session' + (r.diag.sessions.length === 1 ? '' : 's') : '') +
       chip('Build', !!(r.build && r.build.mods.length), r.build ? r.build.pct + '%' : '') +
       '</ul>';
+
+    /* Health by system — roll-up of the log's own due items. */
+    var health = systemHealth(r);
+    html += '<div class="dash-sec"><h3>Health by system</h3>';
+    html += '<p class="dash-empty">' + esc(health.summary) + '</p>';
+    html += '<ul class="health-list">' + health.rows.map(function (row) {
+      var pill = row.status === 'overdue' ? 'health-overdue'
+        : row.status === 'due-soon' ? 'health-soon'
+        : row.status === 'ok' ? 'health-ok' : 'health-nodata';
+      var label = row.status === 'overdue' ? 'Overdue'
+        : row.status === 'due-soon' ? 'Due soon'
+        : row.status === 'ok' ? 'OK' : 'No data';
+      return '<li class="health-row"><span class="health-name">' + esc(row.system.label) + '</span>' +
+        '<span class="health-pill ' + pill + '">' + label + '</span>' +
+        '<span class="health-detail">' + esc(row.detail) + '</span></li>';
+    }).join('') + '</ul>';
+    if (health.unassigned) {
+      html += '<p class="dash-empty">' + health.unassigned + ' task' + (health.unassigned > 1 ? 's' : '') +
+        ' didn&rsquo;t match a system — they still show under Due next below.</p>';
+    }
+    html += '</div>';
 
     /* Due service */
     html += '<div class="dash-sec"><h3>Due next</h3>';
