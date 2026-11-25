@@ -223,6 +223,7 @@ h1 {
 }
 
 .foot p { margin: 0 0 8px; }
+.foot .pg-sw-update { margin: 12px auto; padding: 10px 18px; border: 1px solid var(--accent); border-radius: 6px; background: var(--accent-dim); color: var(--accent-bright); font: 600 1rem/1.3 "Archivo Narrow", sans-serif; letter-spacing: .05em; text-transform: uppercase; cursor: pointer; }
 
 .foot-small {
   color: var(--muted);
@@ -230,6 +231,153 @@ h1 {
 }
 
 .foot a { color: var(--accent-bright); }
+
+/* --- Per-bike dashboard --- */
+
+.dash { margin: 4px 0 34px; }
+
+.dash-head h2 {
+  margin: 0 0 8px;
+  font-family: "UnifrakturMaguntia", serif;
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.dash-sub {
+  margin: 0 0 18px;
+  max-width: 62ch;
+  color: var(--ink-soft);
+  font-size: 1rem;
+}
+
+.dash-wide {
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: .95rem;
+}
+
+.dash-wide b { color: var(--ink); }
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.dash-bike {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.dash-bike[open ] { border-color: var(--line-strong); }
+
+.dash-bike summary {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 16px 18px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.dash-bike summary::-webkit-details-marker { display: none; }
+
+.dash-bike-name {
+  font-family: "UnifrakturMaguntia", serif;
+  font-size: 1.45rem;
+  line-height: 1.15;
+}
+
+.dash-bike-base {
+  display: block;
+  color: var(--muted);
+  font-family: "Archivo Narrow", "Arial Narrow", system-ui, sans-serif;
+  font-size: .82rem;
+  letter-spacing: .04em;
+}
+
+.dash-bike-counts {
+  margin-left: auto;
+  flex: none;
+  color: var(--muted);
+  font-size: .82rem;
+  text-align: right;
+}
+
+.dash-bike-body { padding: 0 18px 18px; }
+
+.dash-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.dash-chip {
+  padding: 4px 10px;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-line);
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+}
+
+.dash-chip.has {
+  border-color: var(--accent);
+  color: var(--accent-bright);
+}
+
+.dash-sec { margin: 0 0 12px; }
+
+.dash-sec h3 {
+  margin: 0 0 4px;
+  color: var(--accent-bright);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.dash-sec p { margin: 0 0 4px; }
+
+.dash-sec ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.dash-sec li { margin-bottom: 3px; }
+
+.dash-due { color: var(--signal); font-weight: 700; }
+.dash-soon { color: #e8b13c; font-weight: 700; }
+.dash-ok { color: var(--ink-soft); }
+
+.dash-empty { color: var(--muted); }
+
+.dash-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: .88rem;
+}
+
+.dash-links a { color: var(--accent-bright); }
+
+.dash-note {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: .88rem;
+}
 
 /* --- Signal dots (red ONLY for "due") --- */
 

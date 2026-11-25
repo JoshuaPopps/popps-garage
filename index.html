@@ -22,6 +22,16 @@
     <p class="lede">Everything built in the garage, in one place. Pick a tool and get to work &mdash; no accounts, no ads, nothing to install unless you want it on your home screen.</p>
   </header>
 
+  <section class="dash" id="bike-dash" aria-label="Your bikes">
+    <div class="dash-head">
+      <h2 class="chrome-text">Your Bikes</h2>
+      <p class="dash-sub">One tap shows where each bike stands across the garage &mdash; what&rsquo;s due, what&rsquo;s open, the last carb change, the last timing job, the last run. Read straight from the apps on this phone; nothing leaves it, and nothing here writes back to them.</p>
+    </div>
+    <p class="dash-wide" id="dash-wide">Checking the garage&hellip;</p>
+    <div class="dash-grid" id="dash-grid"></div>
+    <p class="dash-note" id="dash-note"></p>
+  </section>
+
   <section class="grid" aria-label="Garage apps">
 
     <a class="card" href="https://joshuapopps.github.io/gps-speedometer/">
@@ -95,6 +105,16 @@
       </span>
     </a>
 
+    <a class="card" href="https://joshuapopps.github.io/evo-diagnostic/">
+      <span class="card-img"><img src="assets/evo-diagnostic-90.svg" alt="Stethoscope wrapped around a chrome V-twin engine, purple and chrome on gloss black" loading="lazy"></span>
+      <span class="card-body">
+        <span class="kicker">Diagnostics &middot; Shop sheet N&ordm; 8</span>
+        <span class="card-title chrome-text">The Evo Diagnostic</span>
+        <span class="card-desc">The engine doctor &mdash; guided diagnostics from the factory manuals, parts ID, idle RPM from sound, and VIN decode.</span>
+        <span class="card-cta">Open the diagnostic &rarr;</span>
+      </span>
+    </a>
+
   </section>
 
 
@@ -105,11 +125,634 @@
   </footer>
 
 </main>
+<script src="sw-update.js"></script>
 <script>
 (function () {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
   }
+  var swUpdate = PG_SWUpdate.init({ container: document.querySelector('.foot') });
+})();
+</script>
+<script>
+/* Pocket Garage — per-bike dashboard.
+ *
+ * READ-ONLY: this board reads the sibling apps' on-device stores and
+ * never writes to them — no setItem, no removeItem, no IndexedDB
+ * write transaction anywhere in this file.
+ *
+ * Storage keys / databases, read from each app's own code:
+ * - Evo Diagnostic (the shared roster): localStorage "evo-diagnostic"
+ *   { sessions: [{ when, bike, tree, answers, ranked }],
+ *     baselines: { <roster id>: { rpm, sd, when } },
+ *     bike, bikes: [user-added { id, name, base, carb, timing }] }.
+ *   The roster itself lives in its data.js: b1 1995 Fat Boy Bobber,
+ *   b2 1990 Softail, b3 1947 Knucklehead — same three ids below.
+ * - Carb Tune Journal: localStorage "carb-tune-journal-v1"
+ *   { bikes: { <id>: { id, name, year, make, model, odometer, notes } },
+ *     carbs: { <id>: { id, bike_id, model, nickname, status,
+ *                       baseline: { specs, source } } },
+ *     entries: [{ carb_id, num, date, mileage, changes, ran,
+ *                 conditions, notes }] }.
+ *   Carb bike ids ARE the roster ids (b1/b2/b3) — direct key match.
+ *   Build Sheets' roster confirms it: linked.carb is b1/b2/b3.
+ * - Bike Maintenance Log: localStorage "bike-maintenance-log-v1"
+ *   { bikes: { <id>: { name, year, make, model, notes, odometer,
+ *                       odometer_date } },
+ *     tasks: { <id>: { bike_id, name, every_miles, every_months,
+ *                      notes, baseline_odo, baseline_date } },
+ *     entries: [{ bike_id, task_id, date, odometer, cost, notes }] }.
+ *   Bike ids are creation-order b1, b2, ... with NO roster link
+ *   (Build Sheets leaves linked.maintenance null for exactly this
+ *   reason) — so this app matches by exact normalized NAME only.
+ * - Pocket Garage Dyno: localStorage "pocket-garage-dyno-runs-v1"
+ *   [ { id, savedAt, label,
+ *       combo: { baseline, displacement_ci, compression, carb, cam,
+ *                exhaust, heads, air, fuel, rev_limit },
+ *       peak_hp, peak_hp_rpm, peak_tq, peak_tq_rpm, tempF, altFt } ].
+ *   NO bike field. Baselines map to bikes only by engine family:
+ *   "knuckle-74" is the 1947 Knucklehead (unique); "evo-1340" is the
+ *   Evolution 1340 shared by BOTH the 1995 Fat Boy and the 1990
+ *   Softail — a run on it is shown on both cards, flagged SHARED,
+ *   never silently pinned to one bike.
+ * - GPS Speedometer: localStorage "gpsSpeedo.rides.v1"
+ *   [ { id, start, end, durationMs, distanceM, maxMs, gainM,
+ *       points, imported } ] plus "gpsSpeedo.current.v1" for a ride
+ *   in progress. NO bike field — rides are garage-wide, shown in the
+ *   strip above the cards, never attributed to one bike.
+ * - Ignition Timing Helper: localStorage
+ *   "ignition-timing-helper-log-v1"
+ *   { version: 1, entries: [{ date, bike, ignition, method, curve,
+ *     result, notes }] }. Bike is FREE TEXT (datalist suggestions
+ *   "1995 Fat Boy", "1990 Softail", "1947 Knucklehead") — matched by
+ *   exact normalized name against the aliases below. Build Sheets'
+ *   roster key for timing IS the name, same rule.
+ * - Garage Build Sheets: IndexedDB "garage-build-sheets" v1,
+ *   object stores "kv" + "photos"; kv key "store" holds
+ *   { version, bikes: [{ id, name, base, year, make, model,
+ *                        rosterId, status, ... }],
+ *     mods: [{ id, bikeId, name, cat, stage, date, ... }],
+ *     notes: [{ id, bikeId, date, title, body }],
+ *     issues: [{ id, bikeId, title, severity, date, detail,
+ *                status, fixText, resolvedDate }],
+ *     roster: [{ id, name, base,
+ *                linked: { maintenance, carb, timing } }],
+ *     selectedBikeId }.
+ *   Join is roster-FIRST: a build's roster entry whose linked.carb
+ *   equals the roster id, via bike.rosterId; name match only if no
+ *   roster entry exists. Open issues are status "open".
+ *
+ * Due-task math is the Bike Maintenance Log's own rule, ported here:
+ * last service (or task creation) + interval, miles leg and months
+ * leg, worst leg wins; due-soon window 500 mi / 30 days.
+ */
+(function () {
+  'use strict';
+
+  var ROSTER = [
+    { id: 'b1', name: '1995 Fat Boy Bobber',
+      base: '1995 Harley-Davidson Fat Boy FLSTF',
+      aliases: ['1995 fat boy bobber', '1995 fat boy'],
+      carbKey: 'b1',
+      timingNames: ['1995 fat boy bobber', '1995 fat boy'],
+      dynoBaselines: ['evo-1340'], dynoShared: true },
+    { id: 'b2', name: '1990 Softail',
+      base: '1990 Harley-Davidson Heritage Softail Classic FLSTC',
+      aliases: ['1990 softail'],
+      carbKey: 'b2',
+      timingNames: ['1990 softail'],
+      dynoBaselines: ['evo-1340'], dynoShared: true },
+    { id: 'b3', name: '1947 Knucklehead',
+      base: '1947 Harley-Davidson FL',
+      aliases: ['1947 knucklehead'],
+      carbKey: 'b3',
+      timingNames: ['1947 knucklehead'],
+      dynoBaselines: ['knuckle-74'], dynoShared: false }
+  ];
+
+  var APP_URLS = {
+    carb: 'https://joshuapopps.github.io/carb-tune-journal-pwa/',
+    service: 'https://joshuapopps.github.io/bike-maintenance-log-pwa/',
+    dyno: 'https://joshuapopps.github.io/popps-garage-dyno/',
+    timing: 'https://joshuapopps.github.io/ignition-timing-helper/',
+    diagnostic: 'https://joshuapopps.github.io/evo-diagnostic/',
+    build: 'https://joshuapopps.github.io/garage-build-sheets/',
+    speedo: 'https://joshuapopps.github.io/gps-speedometer/'
+  };
+
+  var SETUP_LABELS = {
+    main_jet: 'Main jet', pilot_jet: 'Slow / pilot jet', needle: 'Needle',
+    needle_clip: 'Needle clip', mixture_screw: 'Mixture screw',
+    float_height: 'Float height', accel_pump: 'Accelerator pump',
+    slide_spring: 'Slide spring', air_jet: 'Air jet / bleed', other: 'Other'
+  };
+  var STAGE_WEIGHTS = { idea: 0, planned: 0.25, purchased: 0.55, installed: 1 };
+  var SOON_MILES = 500, SOON_DAYS = 30;
+
+  /* ---------- small helpers ---------- */
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function norm(s) {
+    return String(s == null ? '' : s).toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function readJSON(key) {
+    try {
+      var raw = localStorage.getItem(key);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) { return null; }
+  }
+  function fmtDate(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return String(iso);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function fmtEpoch(ms) {
+    var d = new Date(ms);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function fmtMiles(n) {
+    return Number(n).toLocaleString('en-US') + ' mi';
+  }
+  function todayISO() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
+      '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function addMonths(iso, n) {
+    var p = String(iso).split('-');
+    var d = new Date(Number(p[0]), Number(p[1]) - 1 + n, Number(p[2]));
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
+      '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function daysBetween(a, b) {
+    var pa = String(a).split('-'), pb = String(b).split('-');
+    var da = Date.UTC(Number(pa[0]), Number(pa[1]) - 1, Number(pa[2]));
+    var db = Date.UTC(Number(pb[0]), Number(pb[1]) - 1, Number(pb[2]));
+    return Math.round((db - da) / 86400000);
+  }
+
+  /* ---------- due math (the Bike Maintenance Log's rule) ---------- */
+
+  function lastService(entries, taskId) {
+    var m = entries.filter(function (e) { return e.task_id === taskId; });
+    if (!m.length) return null;
+    m.sort(function (a, b) {
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      return (a.odometer || 0) - (b.odometer || 0);
+    });
+    return m[m.length - 1];
+  }
+  function taskStatus(store, bikeId, taskId, asOf) {
+    var t = store.tasks[taskId], b = store.bikes[bikeId];
+    if (!t || !b) return null;
+    var entry = lastService(store.entries, taskId);
+    var baseOdo, baseDate, baseLabel;
+    if (entry) {
+      baseOdo = entry.odometer; baseDate = entry.date;
+      baseLabel = 'last done ' + fmtDate(baseDate) + ' @ ' + fmtMiles(baseOdo);
+    } else {
+      baseOdo = t.baseline_odo || 0; baseDate = t.baseline_date || asOf;
+      baseLabel = 'not logged yet — counting from task creation';
+    }
+    var legs = [];
+    if (t.every_miles) {
+      var dueOdo = baseOdo + t.every_miles;
+      var left = dueOdo - b.odometer;
+      if (left <= 0) legs.push({ status: 'overdue', text: fmtMiles(-left) + ' overdue' });
+      else if (left <= SOON_MILES) legs.push({ status: 'due-soon', text: 'due in ' + fmtMiles(left) });
+      else legs.push({ status: 'ok', text: 'due in ' + fmtMiles(left) + ' (@ ' + fmtMiles(dueOdo) + ')' });
+    }
+    if (t.every_months) {
+      var dueDate = addMonths(baseDate, t.every_months);
+      var daysLeft = daysBetween(asOf, dueDate);
+      if (daysLeft < 0) legs.push({ status: 'overdue', text: (-daysLeft) + ' days overdue (was ' + fmtDate(dueDate) + ')' });
+      else if (daysLeft <= SOON_DAYS) legs.push({ status: 'due-soon', text: 'due in ' + daysLeft + ' days (' + fmtDate(dueDate) + ')' });
+      else legs.push({ status: 'ok', text: 'due ' + fmtDate(dueDate) + ' (' + daysLeft + ' days)' });
+    }
+    var order = { overdue: 0, 'due-soon': 1, ok: 2 };
+    var worst = 'ok';
+    legs.forEach(function (leg) { if (order[leg.status] < order[worst]) worst = leg.status; });
+    return { status: worst, details: [baseLabel].concat(legs.map(function (l) { return l.text; })) };
+  }
+
+  /* ---------- build sheets (IndexedDB, read-only) ---------- */
+
+  function readBuildSheets() {
+    return new Promise(function (resolve) {
+      function open() {
+        var req;
+        try { req = indexedDB.open('garage-build-sheets', 1); }
+        catch (e) { resolve(null); return; }
+        req.onsuccess = function () {
+          var db = req.result;
+          try {
+            var tx = db.transaction(['kv'], 'readonly');
+            var g = tx.objectStore('kv').get('store');
+            g.onsuccess = function () { resolve(g.result || null); db.close(); };
+            g.onerror = function () { resolve(null); db.close(); };
+          } catch (e) { resolve(null); try { db.close(); } catch (e2) {} }
+        };
+        req.onerror = function () { resolve(null); };
+        /* If the DB never existed, opening it creates an empty one —
+           nothing stored in it, and the read above finds no store. */
+        req.onupgradeneeded = function () {};
+      }
+      try {
+        if (indexedDB.databases) {
+          indexedDB.databases().then(function (list) {
+            var found = list.some(function (d) { return d.name === 'garage-build-sheets'; });
+            if (!found) { resolve(null); return; }
+            open();
+          }).catch(open);
+        } else { open(); }
+      } catch (e) { open(); }
+    });
+  }
+
+  /* ---------- gather ---------- */
+
+  var data = {
+    carb: readJSON('carb-tune-journal-v1'),
+    service: readJSON('bike-maintenance-log-v1'),
+    dyno: readJSON('pocket-garage-dyno-runs-v1'),
+    speedo: readJSON('gpsSpeedo.rides.v1'),
+    speedoCurrent: readJSON('gpsSpeedo.current.v1'),
+    timing: readJSON('ignition-timing-helper-log-v1'),
+    diag: readJSON('evo-diagnostic'),
+    build: null
+  };
+
+  function bikeByAlias(store, aliases) {
+    if (!store || !store.bikes) return null;
+    var ids = Object.keys(store.bikes);
+    for (var i = 0; i < ids.length; i++) {
+      if (aliases.indexOf(norm(store.bikes[ids[i]].name)) !== -1) return { id: ids[i], bike: store.bikes[ids[i]] };
+    }
+    return null;
+  }
+
+  function perBike(rb) {
+    var r = { roster: rb, carb: null, service: null, timing: [], diag: null,
+      build: null, buildMatchedBy: null, dyno: [], lastServiceEntry: null };
+    var i, k;
+
+    /* Carb — roster key first (bike ids ARE b1/b2/b3). */
+    if (data.carb && data.carb.bikes && data.carb.bikes[rb.carbKey]) {
+      var cb = data.carb.bikes[rb.carbKey];
+      var carbs = Object.keys(data.carb.carbs || {}).map(function (id) { return data.carb.carbs[id]; })
+        .filter(function (c) { return c.bike_id === rb.carbKey; });
+      var entries = (data.carb.entries || []).filter(function (e) {
+        return carbs.some(function (c) { return c.id === e.carb_id; });
+      }).sort(function (a, b) { return (a.num || 0) - (b.num || 0); });
+      r.carb = { bike: cb, carbs: carbs, entries: entries,
+        latest: entries.length ? entries[entries.length - 1] : null };
+    }
+
+    /* Service log — name match only (no roster link exists for it). */
+    var sb = bikeByAlias(data.service, rb.aliases);
+    if (sb) {
+      var asOf = todayISO();
+      var tasks = Object.keys(data.service.tasks || {}).map(function (id) {
+        return { id: id, task: data.service.tasks[id] };
+      }).filter(function (t) { return t.task.bike_id === sb.id; });
+      var due = tasks.map(function (t) {
+        var st = taskStatus(data.service, sb.id, t.id, asOf);
+        return st ? { name: t.task.name, status: st.status, details: st.details } : null;
+      }).filter(Boolean);
+      var order = { overdue: 0, 'due-soon': 1, ok: 2 };
+      due.sort(function (a, b) { return order[a.status] - order[b.status] || (a.name < b.name ? -1 : 1); });
+      var entries = (data.service.entries || []).filter(function (e) { return e.bike_id === sb.id; })
+        .sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+      r.service = { bike: sb.bike, due: due, entries: entries,
+        latest: entries.length ? entries[entries.length - 1] : null };
+      if (entries.length) {
+        var last = entries[entries.length - 1];
+        var t = (data.service.tasks || {})[last.task_id];
+        r.lastServiceEntry = { date: last.date, task: t ? t.name : 'Service' };
+      }
+    }
+
+    /* Timing — free-text bike name, exact normalized match. */
+    if (data.timing && Array.isArray(data.timing.entries)) {
+      r.timing = data.timing.entries.filter(function (e) {
+        return rb.timingNames.indexOf(norm(e.bike)) !== -1;
+      }).sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+    }
+
+    /* Diagnostic — sessions keyed by roster id directly. */
+    if (data.diag) {
+      var sessions = (data.diag.sessions || []).filter(function (s) { return s.bike === rb.id; })
+        .sort(function (a, b) { return a.when < b.when ? -1 : 1; });
+      var baseline = (data.diag.baselines || {})[rb.id] || null;
+      if (sessions.length || baseline) r.diag = { sessions: sessions, baseline: baseline };
+    }
+
+    /* Dyno — baseline family match; evo-1340 is shared, flagged. */
+    if (Array.isArray(data.dyno)) {
+      r.dyno = data.dyno.filter(function (run) {
+        return run.combo && rb.dynoBaselines.indexOf(run.combo.baseline) !== -1;
+      }).sort(function (a, b) { return Date.parse(a.savedAt) - Date.parse(b.savedAt); });
+    }
+
+    /* Build sheets — roster link first, name match only as fallback. */
+    if (data.build && Array.isArray(data.build.bikes)) {
+      var rosterEntry = null, buildBike = null;
+      if (Array.isArray(data.build.roster)) {
+        for (i = 0; i < data.build.roster.length; i++) {
+          var re = data.build.roster[i];
+          if (re.linked && re.linked.carb === rb.carbKey) { rosterEntry = re; break; }
+        }
+      }
+      if (rosterEntry) {
+        for (i = 0; i < data.build.bikes.length; i++) {
+          if (data.build.bikes[i].rosterId === rosterEntry.id) { buildBike = data.build.bikes[i]; break; }
+        }
+        if (buildBike) r.buildMatchedBy = 'roster key';
+      }
+      if (!buildBike) {
+        for (i = 0; i < data.build.bikes.length; i++) {
+          if (rb.aliases.indexOf(norm(data.build.bikes[i].name)) !== -1) {
+            buildBike = data.build.bikes[i]; r.buildMatchedBy = 'name'; break;
+          }
+        }
+      }
+      if (buildBike) {
+        var mods = (data.build.mods || []).filter(function (m) { return m.bikeId === buildBike.id; });
+        var issues = (data.build.issues || []).filter(function (x) { return x.bikeId === buildBike.id; });
+        var openIssues = issues.filter(function (x) { return x.status !== 'resolved'; });
+        var installed = mods.filter(function (m) { return m.stage === 'installed'; }).length;
+        var weight = 0;
+        mods.forEach(function (m) { weight += STAGE_WEIGHTS[m.stage] || 0; });
+        r.build = { bike: buildBike, mods: mods, issues: issues, openIssues: openIssues,
+          installed: installed, pct: mods.length ? Math.round(100 * weight / mods.length) : 0 };
+      }
+    }
+    return r;
+  }
+
+  function unmatchedBikes() {
+    var known = {};
+    ROSTER.forEach(function (rb) { rb.aliases.forEach(function (a) { known[a] = true; }); });
+    var out = [];
+    function scan(store, label, idsAreRoster) {
+      if (!store || !store.bikes) return;
+      Object.keys(store.bikes).forEach(function (id) {
+        var b = store.bikes[id];
+        /* Carb bike ids ARE roster ids (b1/b2/b3); the service log's
+           ids are creation-order in its own store and mean nothing
+           here, so only the carb scan may skip on id. */
+        if (known[norm(b.name)]) return;
+        if (idsAreRoster && (id === 'b1' || id === 'b2' || id === 'b3')) return;
+        out.push(b.name + ' (' + label + ')');
+      });
+    }
+    scan(data.carb, 'carb journal', true);
+    scan(data.service, 'service log', false);
+    if (data.build && Array.isArray(data.build.bikes)) {
+      data.build.bikes.forEach(function (b) {
+        if (!known[norm(b.name)]) out.push(b.name + ' (build sheets)');
+      });
+    }
+    return out;
+  }
+
+  /* ---------- render ---------- */
+
+  function chip(label, has, detail) {
+    return '<li class="dash-chip' + (has ? ' has' : '') + '">' + esc(label) +
+      (has && detail ? ' · ' + esc(detail) : '') + '</li>';
+  }
+
+  function renderBike(r) {
+    var rb = r.roster;
+    var overdue = r.service ? r.service.due.filter(function (d) { return d.status === 'overdue'; }).length : 0;
+    var dueSoon = r.service ? r.service.due.filter(function (d) { return d.status === 'due-soon'; }).length : 0;
+    var openIssues = r.build ? r.build.openIssues.length : 0;
+    var critical = r.build ? r.build.openIssues.some(function (x) { return x.severity === 'critical' || x.severity === 'high'; }) : false;
+    var hasAny = !!(r.carb || r.service || r.timing.length || r.diag || r.build || r.dyno.length);
+    var dot = '';
+    if (overdue > 0 || critical) dot = '<span class="due-dot" role="img" aria-label="Attention needed"></span>';
+    else if (hasAny) dot = '<span class="ok-dot" role="img" aria-label="No urgent items"></span>';
+
+    var counts = [];
+    if (overdue) counts.push(overdue + ' overdue');
+    if (dueSoon) counts.push(dueSoon + ' due soon');
+    if (openIssues) counts.push(openIssues + ' open issue' + (openIssues > 1 ? 's' : ''));
+    if (!counts.length) counts.push(hasAny ? 'all clear' : 'no data yet');
+
+    var latestDyno = r.dyno.length ? r.dyno[r.dyno.length - 1] : null;
+    var html = '<details class="dash-bike"><summary>' + dot +
+      '<span><span class="dash-bike-name chrome-text">' + esc(rb.name) + '</span>' +
+      '<span class="dash-bike-base">' + esc(rb.base) + '</span></span>' +
+      '<span class="dash-bike-counts">' + esc(counts.join(' · ')) + '</span></summary>' +
+      '<div class="dash-bike-body">';
+
+    html += '<ul class="dash-chips">' +
+      chip('Carb', !!(r.carb && r.carb.entries.length), r.carb ? r.carb.entries.length + ' entr' + (r.carb.entries.length === 1 ? 'y' : 'ies') : '') +
+      chip('Service', !!(r.service && r.service.entries.length), r.service ? r.service.entries.length + ' logged' : '') +
+      chip('Dyno', !!latestDyno, latestDyno ? latestDyno.peak_hp + ' hp est.' : '') +
+      chip('Timing', r.timing.length > 0, r.timing.length ? r.timing.length + ' logged' : '') +
+      chip('Diagnostic', !!(r.diag && r.diag.sessions.length), r.diag ? r.diag.sessions.length + ' session' + (r.diag.sessions.length === 1 ? '' : 's') : '') +
+      chip('Build', !!(r.build && r.build.mods.length), r.build ? r.build.pct + '%' : '') +
+      '</ul>';
+
+    /* Due service */
+    html += '<div class="dash-sec"><h3>Due next</h3>';
+    if (!r.service) {
+      html += '<p class="dash-empty">No service log for this bike yet.</p>';
+    } else {
+      var flagged = r.service.due.filter(function (d) { return d.status !== 'ok'; });
+      if (!flagged.length) {
+        html += '<p class="dash-ok">Nothing due. ' +
+          (r.lastServiceEntry ? 'Last service: ' + esc(r.lastServiceEntry.task) + ', ' + fmtDate(r.lastServiceEntry.date) + '.' : 'No services logged yet.') + '</p>';
+      } else {
+        html += '<ul>' + flagged.slice(0, 3).map(function (d) {
+          var cls = d.status === 'overdue' ? 'dash-due' : 'dash-soon';
+          return '<li><span class="' + cls + '">' + esc(d.name) + ' — ' + esc(d.details.slice(1).join('; ') || d.details[0]) + '</span></li>';
+        }).join('') + '</ul>';
+        if (flagged.length > 3) html += '<p class="dash-empty">' + (flagged.length - 3) + ' more due — open the log.</p>';
+      }
+    }
+    html += '</div>';
+
+    /* Open build-sheet issues */
+    html += '<div class="dash-sec"><h3>Open issues</h3>';
+    if (!r.build) {
+      html += '<p class="dash-empty">No build sheet for this bike yet.</p>';
+    } else if (!r.build.openIssues.length) {
+      html += '<p class="dash-ok">No open issues on the build sheet.</p>';
+    } else {
+      html += '<ul>' + r.build.openIssues.slice(0, 3).map(function (x) {
+        return '<li><b>' + esc(x.severity) + '</b> — ' + esc(x.title) +
+          (x.date ? ' <span class="dash-empty">(' + fmtDate(x.date) + ')</span>' : '') + '</li>';
+      }).join('') + '</ul>';
+      if (r.build.openIssues.length > 3) html += '<p class="dash-empty">' + (r.build.openIssues.length - 3) + ' more — open the sheet.</p>';
+    }
+    html += '</div>';
+
+    /* Carb */
+    html += '<div class="dash-sec"><h3>Carb</h3>';
+    if (!r.carb || !r.carb.latest) {
+      html += '<p class="dash-empty">No carb entries yet.</p>';
+    } else {
+      var ce = r.carb.latest;
+      var carb = r.carb.carbs.filter(function (c) { return c.id === ce.carb_id; })[0];
+      var changes = Object.keys(ce.changes || {}).map(function (k) {
+        return (SETUP_LABELS[k] || k) + ' ' + ce.changes[k];
+      }).join(', ');
+      html += '<p>' + esc(carb ? (carb.nickname || carb.model) : 'Carb') + ' — last entry ' + fmtDate(ce.date) +
+        (changes ? ': ' + esc(changes) : '') + (ce.mileage != null ? ' @ ' + fmtMiles(ce.mileage) : '') + '.</p>';
+    }
+    html += '</div>';
+
+    /* Timing */
+    html += '<div class="dash-sec"><h3>Timing</h3>';
+    if (!r.timing.length) {
+      html += '<p class="dash-empty">No timing jobs logged yet.</p>';
+    } else {
+      var te = r.timing[r.timing.length - 1];
+      html += '<p>Last job ' + fmtDate(te.date) + ' — ' + esc(te.method) +
+        (te.ignition === 'dyna-2000i' ? ' · Dyna 2000i' + (te.curve != null ? ' curve ' + te.curve : '') : ' · stock module') +
+        (te.result ? ': ' + esc(te.result) : '') + '.</p>';
+    }
+    html += '</div>';
+
+    /* Diagnostic */
+    html += '<div class="dash-sec"><h3>Diagnostic</h3>';
+    if (!r.diag || !r.diag.sessions.length) {
+      html += '<p class="dash-empty">No diagnostic sessions yet.' +
+        (r.diag && r.diag.baseline ? ' Healthy baseline on file: ' + r.diag.baseline.rpm + ' rpm idle (' + fmtDate(r.diag.baseline.when) + ').' : '') + '</p>';
+    } else {
+      var se = r.diag.sessions[r.diag.sessions.length - 1];
+      var tree = String(se.tree || '').replace(/-/g, ' ');
+      html += '<p>Last session ' + fmtDate(se.when) + ' — ' + esc(tree) +
+        (se.ranked && se.ranked.length ? ', top cause: ' + esc(se.ranked[0]) : '') + '.' +
+        (r.diag.baseline ? ' Baseline idle ' + r.diag.baseline.rpm + ' rpm.' : '') + '</p>';
+    }
+    html += '</div>';
+
+    /* Dyno */
+    html += '<div class="dash-sec"><h3>Dyno</h3>';
+    if (!latestDyno) {
+      html += '<p class="dash-empty">No saved runs for this bike yet.</p>';
+    } else {
+      html += '<p>Latest run ' + fmtDate(latestDyno.savedAt) + ' — ' +
+        latestDyno.peak_hp + ' hp @ ' + Number(latestDyno.peak_hp_rpm).toLocaleString('en-US') + ' rpm, ' +
+        latestDyno.peak_tq + ' lb-ft (estimates, not a dyno sheet)' +
+        (rb.dynoShared ? ' — Evo 1340 baseline, shared with the other Evo; not tied to one bike.' : ' — ' + esc(latestDyno.label || '')) + '</p>';
+    }
+    html += '</div>';
+
+    /* Build progress */
+    if (r.build) {
+      html += '<div class="dash-sec"><h3>Build</h3><p>' +
+        r.build.installed + ' of ' + r.build.mods.length + ' mods installed — ' + r.build.pct + '% built.' +
+        (r.buildMatchedBy === 'name' ? ' (matched to the sheet by name — no roster link yet)' : '') + '</p></div>';
+    }
+
+    html += '<div class="dash-links">' +
+      '<a href="' + APP_URLS.carb + '">Carb journal</a>' +
+      '<a href="' + APP_URLS.service + '">Service log</a>' +
+      '<a href="' + APP_URLS.dyno + '">Dyno</a>' +
+      '<a href="' + APP_URLS.timing + '">Timing</a>' +
+      '<a href="' + APP_URLS.diagnostic + '">Diagnostic</a>' +
+      '<a href="' + APP_URLS.build + '">Build sheet</a>' +
+      '</div></div></details>';
+    return html;
+  }
+
+  function render() {
+    var wide = document.getElementById('dash-wide');
+    var grid = document.getElementById('dash-grid');
+    var note = document.getElementById('dash-note');
+    if (!wide || !grid) return;
+
+    /* Garage-wide strip: latest ride + latest dyno run (neither is
+       tagged to a bike, so neither is pinned to a card). */
+    var parts = [];
+    var rides = Array.isArray(data.speedo) ? data.speedo.slice() : [];
+    rides.sort(function (a, b) { return (b.start || 0) - (a.start || 0); });
+    if (rides.length) {
+      var ride = rides[0];
+      var mi = ride.distanceM ? (ride.distanceM / 1609.34) : 0;
+      var mins = ride.durationMs ? Math.round(ride.durationMs / 60000) : 0;
+      var top = ride.maxMs ? Math.round(ride.maxMs * 2.23694) : 0;
+      parts.push('<b>Last ride</b> ' + fmtEpoch(ride.start) + ' — ' + mi.toFixed(1) + ' mi in ' +
+        mins + ' min, top ' + top + ' mph (any bike — rides aren&rsquo;t tagged to a bike).');
+    } else {
+      parts.push('<b>Last ride</b> — no rides saved yet.');
+    }
+    if (data.speedoCurrent && data.speedoCurrent.start) {
+      parts.push('<b>Ride in progress</b> — started ' + fmtEpoch(data.speedoCurrent.start) + '.');
+    }
+    var allRuns = Array.isArray(data.dyno) ? data.dyno.slice() : [];
+    allRuns.sort(function (a, b) { return Date.parse(a.savedAt) - Date.parse(b.savedAt); });
+    if (allRuns.length) {
+      var lr = allRuns[allRuns.length - 1];
+      parts.push('<b>Latest dyno run</b> ' + fmtDate(lr.savedAt) + ' — ' +
+        lr.peak_hp + ' hp / ' + lr.peak_tq + ' lb-ft (estimates) · ' + esc(lr.label || '') + '.');
+    } else {
+      parts.push('<b>Latest dyno run</b> — no saved runs yet.');
+    }
+    wide.innerHTML = parts.join(' &nbsp;·&nbsp; ');
+
+    /* Roster bikes, plus any user-added bikes stored by the Diagnostic. */
+    var roster = ROSTER.slice();
+    if (data.diag && Array.isArray(data.diag.bikes)) {
+      data.diag.bikes.forEach(function (b) {
+        if (!b || !b.id || !b.name) return;
+        if (roster.some(function (rb) { return rb.id === b.id; })) return;
+        roster.push({ id: b.id, name: b.name, base: b.base || '',
+          aliases: [norm(b.name)], carbKey: null,
+          timingNames: [norm(b.name)], dynoBaselines: [], dynoShared: false });
+      });
+    }
+    grid.innerHTML = roster.map(function (rb) { return renderBike(perBike(rb)); }).join('');
+
+    var anyData = !!(data.carb || data.service || (Array.isArray(data.dyno) && data.dyno.length) ||
+      (Array.isArray(data.speedo) && data.speedo.length) ||
+      (data.timing && data.timing.entries && data.timing.entries.length) ||
+      (data.diag && (data.diag.sessions || []).length) || data.build);
+    var notes = [];
+    if (!anyData) {
+      notes.push('Nothing stored on this phone yet — open any app above and log something; this board fills itself in.');
+    }
+    var unmatched = unmatchedBikes();
+    if (unmatched.length) {
+      notes.push('Also stored, but not on the shared roster: ' + unmatched.map(esc).join('; ') + ' — name them like the roster bikes to join them up.');
+    }
+    if (data.service) {
+      var svcMatched = ROSTER.some(function (rb) { return !!bikeByAlias(data.service, rb.aliases); });
+      if (!svcMatched) notes.push('Service log matched by name — it has no roster link yet, so a renamed bike won&rsquo;t follow.');
+    }
+    note.innerHTML = notes.join('<br>');
+  }
+
+  render();
+  /* Build Sheets lives in IndexedDB — async. Re-render when it lands. */
+  var buildDone = false;
+  function finishBuild(store) {
+    if (buildDone) return;
+    buildDone = true;
+    data.build = store;
+    render();
+  }
+  var buildTimeout = setTimeout(function () { finishBuild(null); }, 2000);
+  readBuildSheets().then(function (store) {
+    clearTimeout(buildTimeout);
+    finishBuild(store);
+  }).catch(function () {
+    clearTimeout(buildTimeout);
+    finishBuild(null);
+  });
 })();
 </script>
 </body>

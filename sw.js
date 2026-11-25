@@ -1,10 +1,11 @@
 /* Pocket Garage service worker — caches the landing page shell so the
    garage works offline and can be added to the home screen. */
-var CACHE = 'pocket-garage-v19';
+var CACHE = 'pocket-garage-v22';
 var ASSETS = [
   './',
   'index.html',
   'styles.css',
+  'sw-update.js',
   'manifest.webmanifest',
   'assets/icon.svg',
   'assets/evo-wiring-90b.svg',
@@ -13,14 +14,20 @@ var ASSETS = [
   'assets/dyno-90.svg',
   'assets/speedometer-90.svg',
   'assets/timing-90.svg',
-  'assets/build-sheets-90.svg'
+  'assets/build-sheets-90.svg',
+  'assets/evo-diagnostic-90.svg'
 ];
 
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE).then(function (cache) { return cache.addAll(ASSETS); })
   );
-  self.skipWaiting();
+});
+
+/* Update button: the waiting worker takes over only when the user taps
+ * "Update available" — no install-time skipWaiting (see sw-update.js). */
+self.addEventListener('message', function (e) {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', function (event) {
