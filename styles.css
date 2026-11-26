@@ -212,6 +212,73 @@ h1 {
   letter-spacing: .05em;
 }
 
+/* --- What's new (changelog) --- */
+
+.changelog { margin: 4px 0 34px; }
+
+.changelog-head h2 {
+  margin: 0 0 8px;
+  font-family: "UnifrakturMaguntia", serif;
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.changelog-sub {
+  margin: 0 0 18px;
+  max-width: 62ch;
+  color: var(--ink-soft);
+  font-size: 1rem;
+}
+
+.log-app {
+  margin-bottom: 16px;
+  padding: 18px 20px 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.log-app h3 {
+  margin: 0 0 4px;
+  font-family: "UnifrakturMaguntia", serif;
+  font-size: 1.45rem;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.log-live {
+  padding: 2px 8px;
+  border: 1px solid var(--accent);
+  color: var(--accent-bright);
+  font-family: "Archivo Narrow", "Arial Narrow", system-ui, sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.log-ver h4 {
+  margin: 14px 0 4px;
+  color: var(--accent-bright);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.log-ver ul { margin: 0; padding-left: 18px; }
+.log-ver li { margin-bottom: 3px; color: var(--ink-soft); }
+.log-ver code { color: var(--ink); font-size: .92em; }
+
+.log-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
 /* --- Footer --- */
 
 .foot {

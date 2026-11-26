@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pocket Garage</title>
-<meta name="description" content="One garage, eight tools — the GPS speedometer, Evo wiring planner, carb tune journal, bike maintenance log, garage dyno, ignition timing helper, garage build sheets and Evo diagnostic. Built in the garage, open source and free.">
+<meta name="description" content="One garage, fourteen tools — the GPS speedometer, Evo wiring planner, carb tune journal, bike maintenance log, garage dyno, ignition timing helper, garage build sheets, Evo diagnostic, fuel log, parts stash, 3D print queue, documents and renewals, gear locker and library reader. Built in the garage, open source and free.">
 <meta name="theme-color" content="#070709">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
@@ -17,7 +17,7 @@
 <main class="wrap">
 
   <header class="masthead">
-    <p class="eyebrow">shop notes &mdash; one garage, eight tools</p>
+    <p class="eyebrow">shop notes &mdash; one garage, fourteen tools</p>
     <h1 class="chrome-text">Pocket Garage</h1>
     <p class="lede">Everything built in the garage, in one place. Pick a tool and get to work &mdash; no accounts, no ads, nothing to install unless you want it on your home screen.</p>
     <p class="freeline">Free. No account. Works offline in the garage.</p>
@@ -116,6 +116,403 @@
       </span>
     </a>
 
+    <a class="card" href="https://joshuapopps.github.io/fuel-log-pwa/">
+      <span class="card-img"><img src="assets/fuel-log-90.png" alt="Chrome fuel pump with MPG readout, purple and chrome on gloss black" loading="lazy"></span>
+      <span class="card-body">
+        <span class="kicker">Fuel &middot; Shop sheet N&ordm; 9</span>
+        <span class="card-title chrome-text">Fuel Log</span>
+        <span class="card-desc">Every fill-up, real MPG per bike &mdash; miles since the last fill-up divided by gallons at this one.</span>
+        <span class="card-cta">Open the log &rarr;</span>
+      </span>
+    </a>
+
+    <a class="card" href="https://joshuapopps.github.io/parts-stash-pwa/">
+      <span class="card-img"><img src="assets/parts-stash-90.png" alt="Chrome gear with PARTS label, purple and chrome on gloss black" loading="lazy"></span>
+      <span class="card-body">
+        <span class="kicker">Parts &middot; Shop sheet N&ordm; 10</span>
+        <span class="card-title chrome-text">Parts Stash</span>
+        <span class="card-desc">Every spare part on the shelf &mdash; name, part number, bin, cost, and the whole shelf&rsquo;s value at a glance.</span>
+        <span class="card-cta">Open the stash &rarr;</span>
+      </span>
+    </a>
+
+    <a class="card" href="https://joshuapopps.github.io/3d-print-queue-pwa/">
+      <span class="card-img"><img src="assets/3d-print-queue-90.png" alt="Chrome print cube with PRINT label, purple and chrome on gloss black" loading="lazy"></span>
+      <span class="card-body">
+        <span class="kicker">Printing &middot; Shop sheet N&ordm; 11</span>
+        <span class="card-title chrome-text">3D Print Queue</span>
+        <span class="card-desc">Every print job &mdash; file, printer, material, status &mdash; one tap moves it through the queue.</span>
+        <span class="card-cta">Open the queue &rarr;</span>
+      </span>
+    </a>
+
+    <a class="card" href="https://joshuapopps.github.io/documents-renewals-pwa/">
+      <span class="card-img"><img src="assets/documents-renewals-90.png" alt="Chrome document page with DOCS label, purple and chrome on gloss black" loading="lazy"></span>
+      <span class="card-body">
+        <span class="kicker">Papers &middot; Shop sheet N&ordm; 12</span>
+        <span class="card-title chrome-text">Documents &amp; Renewals</span>
+        <span class="card-desc">Registration, insurance, titles, and anything else with a date on it &mdash; overdue, due soon, or current.</span>
+        <span class="card-cta">Open the papers &rarr;</span>
+      </span>
+    </a>
+
+    <a class="card" href="https://joshuapopps.github.io/gear-locker-pwa/">
+      <span class="card-img"><img src="assets/gear-locker-90.png" alt="Chrome full-face helmet with GEAR label, purple and chrome on gloss black" loading="lazy"></span>
+      <span class="card-body">
+        <span class="kicker">Gear &middot; Shop sheet N&ordm; 13</span>
+        <span class="card-title chrome-text">Gear Locker</span>
+        <span class="card-desc">Every jacket, helmet, glove, and boot &mdash; what it is, what size, what shape it&rsquo;s in, and what it cost.</span>
+        <span class="card-cta">Open the locker &rarr;</span>
+      </span>
+    </a>
+
+    <a class="card" href="https://joshuapopps.github.io/library-reader-pwa/">
+      <span class="card-img"><img src="assets/library-reader-90.png" alt="Chrome open book with purple bookmark and READ label, purple and chrome on gloss black" loading="lazy"></span>
+      <span class="card-body">
+        <span class="kicker">Library &middot; Shop sheet N&ordm; 14</span>
+        <span class="card-title chrome-text">Library Reader</span>
+        <span class="card-desc">Bring your own manual &mdash; load a PDF from your device, read it page by page, search it, bookmark it.</span>
+        <span class="card-cta">Open the reader &rarr;</span>
+      </span>
+    </a>
+
+  </section>
+
+  <section class="changelog" id="whats-new" aria-label="What's new">
+    <div class="changelog-head">
+      <h2 class="chrome-text">What&rsquo;s New</h2>
+      <p class="changelog-sub">What changed in the garage, per version. Every entry comes from the published build record. Versions not listed have no surviving per-version record &mdash; the earliest releases of each app, plus diagnostics v4 and v9, carb v9, bike log v12, and landing v23. The speedometer&rsquo;s lean-angle update (Nov 24) shipped without a cache bump, so it has no block of its own.</p>
+    </div>
+
+    <article class="log-app">
+      <h3><span class="chrome-text">Pocket Garage</span> <span class="log-live">v27 live</span></h3>
+      <div class="log-ver">
+        <h4>v27 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>This page gained a What&rsquo;s New section &mdash; the changelog you&rsquo;re reading.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v28 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Backfilled this changelog to the earliest versions with a published build record (see the note above for what&rsquo;s still not covered).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v26 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Tab favicon is now the SPEED skull (<code>assets/icon.svg</code>). Install icons unchanged.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v25 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Health by system on the per-bike dashboard &mdash; a status per system (Brakes, Tires, Engine, Electrical, Fluids) from bike-log data. Missing data shows &ldquo;No data,&rdquo; never a guess.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v24 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Positioning line in the masthead &mdash; &ldquo;Free. No account. Works offline in the garage.&rdquo;</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v22 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Publish &mdash; the Evo Diagnostic card (Nº 8), the per-bike dashboard, and the update button went live.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v21 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>&ldquo;Your Bikes&rdquo; per-bike dashboard &mdash; due service, open build-sheet issues, latest carb / timing / diagnostic / dyno entries, read-only by construction.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v20 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Evo Diagnostic card (Nº 8) added to the grid.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="log-app">
+      <h3><span class="chrome-text">GPS Speedometer</span> <span class="log-live">v3 live</span></h3>
+      <div class="log-ver">
+        <h4>v3 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Planned-route GPX export (GPX 1.1 &mdash; waypoints plus the full routed track, so it follows the road, not straight lines).</li>
+          <li>Fixed the Export GPX and Navigate buttons staying visible after Clear plan.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v2 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Route planning &mdash; up to 8 waypoints, Valhalla motorcycle routing with OSRM fallback, fuel stops by your miles-per-tank. App 1.4.0.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="log-app">
+      <h3><span class="chrome-text">Carb Tune Journal</span> <span class="log-live">v11 live</span></h3>
+      <div class="log-ver">
+        <h4>v11 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Shared parts core wired in &mdash; prices and torque now come from pg-parts-core.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v10 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Jetting weather correction &mdash; 5 direction-only rules (hot, humid air runs richer; cold, dry air runs leaner). No per-degree factor exists anywhere in the library, so none is given.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v8 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Handoff receiver &mdash; diagnoses from the Evo Diagnostic open the wizard at the suggested step.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v7 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Jetting wizard tab (S&amp;S Super E 9 steps, CV40 5 steps, generic 3-step) plus altitude per bike &mdash; typed, by Arizona ZIP lookup, or by phone GPS. Correction is direction-only; no published per-foot table exists.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="log-app">
+      <h3><span class="chrome-text">Bike Maintenance Log</span> <span class="log-live">v18 live</span></h3>
+      <div class="log-ver">
+        <h4>v18 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Tire-age clock &mdash; the Michelin/Dunlop 5/10 rule from the DOT date: inspection every year past 5, replace by 10 years even if the tread looks fine.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v17 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Rides tab &mdash; log rides by bike (route, miles, notes). Rides deliberately do not move the odometer.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v16 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Drive-chain lube task and wear clock for chain-drive Sportsters (Clymer, every 300 mi, 1986&ndash;90 only).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v15 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Handoff receiver for timing jobs &mdash; Send to Bike Log from the Ignition Timing Helper, with the interval pre-filled at 5,000 mi.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v14 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Per-component wear clocks (16, factory intervals only); receipt photo attach on expenses; Sportster factory-schedule auto-fill (1986&ndash;2003, 18 tasks).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v13 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Expenses tab &mdash; log costs by bike and category, per-category totals, per-entry delete; history export carries an expenses section.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v11 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Handoff receiver &mdash; diagnoses from the Evo Diagnostic become tasks (you set the interval; an existing task pre-fills the log form instead of duplicating).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v10 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Due reminders card (overdue and due-soon only, worst first) plus per-bike service history export (JSON, text, or copy).</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="log-app">
+      <h3><span class="chrome-text">Pocket Garage Dyno</span> <span class="log-live">v16 live</span></h3>
+      <div class="log-ver">
+        <h4>v16 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>SAE J1349 weather-correction card &mdash; measured HP plus station weather gives corrected HP (worked example: 100 hp &rarr; 101.7 hp).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v15 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Compare two saved runs &mdash; overlaid HP/torque curves plus a peaks table with differences.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v12 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Load a saved run &mdash; puts the run&rsquo;s full combo back on the Dyno tab and re-runs it as a fresh estimate.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="log-app">
+      <h3><span class="chrome-text">Ignition Timing Helper</span> <span class="log-live">v6 live</span></h3>
+      <div class="log-ver">
+        <h4>v6 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Send to Bike Log &mdash; per-entry handoff with an ask-at-send-time bike pick. Free-text / &ldquo;Other&rdquo; bikes can&rsquo;t be sent.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="log-app">
+      <h3><span class="chrome-text">Garage Build Sheets</span> <span class="log-live">v12 live</span></h3>
+      <div class="log-ver">
+        <h4>v12 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Wiring duplicate warning on the confirm card, and the full wiring plan is now stored on the mod record.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v11 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Wiring handoff receiver &mdash; plans from the Evo Wiring Planner become Idea mods. Cache-name drift fixed (store.js now agrees with sw.js).</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="log-app">
+      <h3><span class="chrome-text">The Evo Diagnostic</span> <span class="log-live">v22 live</span></h3>
+      <div class="log-ver">
+        <h4>v22 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Five tree gap-fills from the Sportster trouble manual &mdash; seized-engine cause, starter voltage-drop tests, 25 in-Hg vacuum-petcock bench test, leakdown over 12% rule, float-bowl tap test.</li>
+          <li>CV carb rebuild card (FSM &sect;4; manifold capscrews 15&ndash;17 ft-lbs).</li>
+          <li>Trees now show only your bike&rsquo;s year checks. Atlas photo no longer shown twice.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v21 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Sound spectrum comparison in the Listen tab &mdash; 8 bands, 50 Hz&ndash;12 kHz, a band counts as changed at &plusmn;6 dB. Unvalidated until checked against real recordings.</li>
+          <li>Tap-the-photo atlas: 4 tappable regions on the 1990 Softail still (heads, crankcase, fork, rear axle). The carb is deliberately unmapped &mdash; it&rsquo;s hidden behind the air-cleaner cover.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v20 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Five new trees from the Sportster trouble manual (speedometer, turn signals, poor power, overheating, starter won&rsquo;t disengage) &mdash; 19 trees, 142 causes.</li>
+          <li>Four oil/fluid Shop cards (engine 3 qt, transmission 24 oz, primary ~32 oz 1997 / ~26 oz 1998, DOT 5 brake fluid).</li>
+          <li>Parts interchange, 7 &rarr; 14 rows.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v19 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Three Shop cards &mdash; brake pads, fork oil, first 500-mile service (27 items).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v18 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Four Shop cards &mdash; drive belt, clutch adjustment, primary chain adjustment, storage / winterize.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v17 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Knucklehead VIN decode in the VIN tab (1940&ndash;47 serial system &mdash; 47FL6216 = 1947 FL, 74ci OHV, 7.0:1) plus the Knucklehead tire-pressure table (4.00&times;18 / 5.00&times;16).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v16 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Unit converter and tire reader cards in the Shop tab.</li>
+          <li>Two Easyriders Vol. 3 citations corrected and wired as causes (idle-jet ladder; pushrod-tube seals and manifold O-rings).</li>
+          <li>The FSM &ldquo;also perform &hellip; annually&rdquo; footnote wired onto engine oil, brake fluid, and wheel bearings.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v15 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>4 new causes from Tech Tips Vols 2 + 4 (104 causes total).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v14 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Shared parts core wired in &mdash; pg-parts-core v1 (42 part keys, 71 torque rows).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v13 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Diagnosis history, shareable text report, resumable trees, safety blocks, wizard front step, Sportster Clymer tables, smoking / oil-consumption tree (14th).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v12 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>NHTSA complaint-frequency counts on causes &mdash; 88 of 91 show a family count, honestly labeled as family-level, not per exact fault.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v11 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Shop tab &mdash; 11 cards (plug reader, wire/fuse, gear ratio, tap &amp; drill, bolt ID, oil viscosity, compression ratio, carb CFM, sag setter, parts interchange, pre-ride check).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v10 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Library sweep &mdash; 35 new causes from Easyriders, Tech Tips Vol. 3 (OCR&rsquo;d, 129 pp), and the manuals (91 causes total); Sportster layer (torque chapter, capacities, charging and compression notes); jackshaft atlas part (41 total).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v8 &mdash; Nov 25, 2026</h4>
+        <ul>
+          <li>Starting-system diagram (traced from FSM &sect;5 Fig. 5-1); compression test card; 2 new trees (13 total, 56 causes); 4 more atlas parts (40 total); Dyno &rarr; Build Sheets send.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v7 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Battery &amp; charging guided card (8 steps, FSM &sect;8); 6 more atlas parts (36 total); handoff sending side &mdash; Send to Carb Journal / Send to Bike Log.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v6 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Torque sequences &mdash; head-bolt and crankcase fastener sequences with hand-traced SVGs (including the FSM&rsquo;s own 20&ndash;35 Nm crankcase misprint, flagged).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v5 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Chapter torque tables &mdash; 51 rows in 5 systems, 69 rows total; local spots grew to 11 shops; parts &amp; pricing wired in (41 price keys, live-checked Nov 24).</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v3 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Torque tab pulled in &mdash; 18 FSM &sect;2 torque rows plus capacities, tire pressures, dimensions, and weights.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v2 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>Tap-to-identify on all 7 diagrams (30 parts); video capture in the Listen tab; baseline comparison; full TSB list; complaint-frequency bars; XL1200S flash codes; 3 new trees (11 total); past-diagnoses history; any-bike picker; tire-date decoder; deeper VIN codes.</li>
+        </ul>
+      </div>
+      <div class="log-ver">
+        <h4>v1 &mdash; Nov 24, 2026</h4>
+        <ul>
+          <li>First release &mdash; 8 diagnostic trees, RPM meter, VIN decoder, recalls / TSB lookup, atlas with CC photos and a hand-traced CV40 schematic, photo upload with plug reading, share-a-diagnosis, export / import.</li>
+        </ul>
+      </div>
+    </article>
+
+    <p class="log-note">The Evo Wiring Planner isn&rsquo;t versioned in the build record, so it has no entry here.</p>
   </section>
 
 
